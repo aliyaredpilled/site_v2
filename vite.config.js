@@ -16,6 +16,7 @@ const config = ({ mode }) => {
     },
     build: {
       outDir: "build",
+      sourcemap: false,
       rollupOptions: {
         output: {
           manualChunks: (id) => {

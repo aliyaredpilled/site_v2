@@ -26,7 +26,7 @@ const apps = [
     name: "Settings",
     icon: "settings",
     type: "app",
-    action: "SETTINGS",
+    action: "SETTINGS"
   },
   {
     name: "Task Manager",
@@ -54,18 +54,12 @@ const apps = [
     payload: "https://www.buymeacoffee.com/blueedgetechno",
   },
   {
-    name: "Store",
-    icon: "store",
-    type: "app",
-    action: "WNSTORE",
-  },
-  {
     name: "Recycle Bin",
     icon: "bin0",
     type: "app",
   },
   {
-    name: "Blue",
+    name: "Topson",
     icon: "win/user",
     type: "app",
     action: "EXPLORER",
@@ -205,12 +199,12 @@ const apps = [
     icon: "security",
     type: "app",
   },
-  {
-    name: "Spotify",
-    icon: "spotify",
-    type: "app",
-    action: "SPOTIFY",
-  },
+  // {
+  //   name: "Spotify",
+  //   icon: "spotify",
+  //   type: "app",
+  //   action: "SPOTIFY",
+  // },
   {
     name: "Sharepoint",
     icon: "share",
@@ -276,29 +270,101 @@ const apps = [
     action: "WHITEBOARD",
   },
   {
-    name: "Cortana",
-    icon: "cortana",
+    name: "Windows Update",
+    icon: "update",
     type: "app",
   },
   {
-    name: "Github",
-    icon: "github",
+    name: "Word",
+    icon: "word",
     type: "app",
-    action: "EXTERNAL",
-    payload: "https://github.com/blueedgetechno/win11React",
   },
   {
     name: "Unescape",
     icon: "unescape",
-    type: "action",
-    action: "EXTERNAL",
-    payload: "https://blueedge.me/unescape",
+    type: "app",
+    action: "UNESCAPE",
   },
   {
     name: "Discord",
     icon: "discord",
     type: "app",
-    action: "DISCORD",
+    action: "EXTERNAL",
+    payload: "https://discord.com/invite/KKMKHxjZ5B",
+  },
+  {
+    name: "О нас",
+    icon: "/img/landing/icons_svg/О нас.svg",
+    type: "app",
+    color: "#2196f3"
+  },
+  {
+    name: "Проекты",
+    icon: "/img/landing/icons_svg/Проекты.svg",
+    type: "app",
+    color: "#2196f3"
+  },
+  {
+    name: "Партнеры",
+    icon: "/img/landing/icons_svg/Партнеры.svg",
+    type: "app",
+    color: "#2196f3"
+  },
+  {
+    name: "Контакты",
+    icon: "/img/landing/icons_svg/Контакты.svg",
+    type: "app",
+    color: "#2196f3"
+  },
+  {
+    name: "Старый сайт",
+    icon: "/img/landing/icons_svg/Старый сайт.svg",
+    type: "app",
+    action: "EXTERNAL",
+    payload: "https://topson.co/#ru",
+    color: "#2196f3"
+  },
+  {
+    name: "ВКонтакте",
+    icon: "services/vk",
+    type: "app",
+    action: "EXTERNAL",
+    payload: "http://vk.com/",
+  },
+  {
+    name: "Mail.ru",
+    icon: "services/mailru",
+    type: "app",
+    action: "EXTERNAL",
+    payload: "https://mail.ru/",
+  },
+  {
+    name: "Яндекс",
+    icon: "yandex",
+    type: "app",
+    action: "EXTERNAL",
+    payload: "https://ya.ru/",
+  },
+  {
+    name: "Яндекс Почта",
+    icon: "yandex_mail",
+    type: "app",
+    action: "EXTERNAL",
+    payload: "https://360.yandex.ru/mail/",
+  },
+  {
+    name: "Додо Пицца",
+    icon: "dodo",
+    type: "app",
+    action: "EXTERNAL",
+    payload: "https://dodopizza.ru/",
+  },
+  {
+    name: "Бургер Кинг",
+    icon: "burgerking",
+    type: "app",
+    action: "EXTERNAL",
+    payload: "https://burgerkingrus.ru/",
   },
 ];
 

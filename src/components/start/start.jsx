@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Icon } from "../../utils/general";
+import { Icon, Image } from "../../utils/general";
 
 export const StartMenu = () => {
   const { align } = useSelector((state) => state.taskbar);
@@ -66,21 +66,27 @@ export const StartMenu = () => {
 
   const clickDispatch = (event) => {
     var action = {
-      type: event.target.dataset.action,
-      payload: event.target.dataset.payload,
+      type: event.currentTarget.dataset.action,
+      payload: event.currentTarget.dataset.payload,
     };
+
+    console.log("[clickDispatch] Action Type:", action.type);
 
     if (action.type) {
       dispatch(action);
     }
 
-    if (
-      action.type &&
-      (action.payload == "full" || action.type == "EDGELINK")
-    ) {
+    // Список действий, при которых НЕ нужно скрывать меню Пуск
+    const keepMenuOpenActions = ["STARTPWC", "WALLALOCK", "WALLSHUTDN", "WALLRESTART"];
+
+    // Скрываем меню, только если действие не входит в список исключений
+    if (action.type && !keepMenuOpenActions.includes(action.type)) {
+      console.log(`[clickDispatch] Dispatching STARTHID because action type (${action.type}) is NOT in keepOpen list.`); // Обновленная отладка
       dispatch({
         type: "STARTHID",
       });
+    } else if (action.type && keepMenuOpenActions.includes(action.type)) {
+      console.log(`[clickDispatch] NOT Dispatching STARTHID because action type (${action.type}) IS in keepOpen list.`); // Обновленная отладка
     }
 
     if (action.type == "STARTALPHA") {
@@ -121,14 +127,6 @@ export const StartMenu = () => {
               <div className="pinnedApps">
                 <div className="stAcbar">
                   <div className="gpname">Pinned</div>
-                  <div
-                    className="gpbtn prtclk"
-                    onClick={clickDispatch}
-                    data-action="STARTALL"
-                  >
-                    <div>All apps</div>
-                    <Icon fafa="faChevronRight" width={8} />
-                  </div>
                 </div>
                 <div className="pnApps">
                   {start.pnApps.map((app, i) => {
@@ -141,7 +139,7 @@ export const StartMenu = () => {
                         value={app.action != null}
                         onClick={clickDispatch}
                         data-action={app.action}
-                        data-payload={app.payload || "full"}
+                        data-payload={app.payload || 'mini'}
                       >
                         <Icon className="pnIcon" src={app.icon} width={32} />
                         <div className="appName">{app.name}</div>
@@ -167,7 +165,7 @@ export const StartMenu = () => {
                         value={app.action != null}
                         onClick={clickDispatch}
                         data-action={app.action}
-                        data-payload={app.payload || "full"}
+                        data-payload={app.payload || 'mini'}
                       >
                         <Icon className="pnIcon" src={app.icon} width={32} />
                         <div className="acInfo">
@@ -220,7 +218,7 @@ export const StartMenu = () => {
                         className="allApp prtclk"
                         onClick={clickDispatch}
                         data-action={app.action}
-                        data-payload={app.payload || "full"}
+                        data-payload={app.payload || 'mini'}
                       >
                         <Icon className="pnIcon" src={app.icon} width={24} />
                         <div className="appName">{app.name}</div>
@@ -261,18 +259,17 @@ export const StartMenu = () => {
           </div>
           <div className="menuBar">
             <div className="profile handcr">
-              <Icon
-                src="blueProf"
-                ui
-                rounded
-                width={26}
-                click="EXTERNAL"
-                payload="https://blueedge.me"
+              <Image
+                src="/img/ui/avatar_cat.png"
+                className="rounded-full overflow-hidden"
+                w={26}
+                h={26}
+                ext
               />
-              <div className="usName">{userName}</div>
+              <div className="usName">Topson</div>
             </div>
             <div className="relative powerMenu">
-              <div className="powerCont" data-vis={start.pwctrl}>
+              <div className="powerCont w-max" data-vis={start.pwctrl}>
                 <div
                   className="flex prtclk items-center gap-2"
                   onClick={clickDispatch}
@@ -290,7 +287,7 @@ export const StartMenu = () => {
                       fill="currentColor"
                     />
                   </svg>
-                  <span>Lock</span>
+                  <span className="whitespace-nowrap">Lock</span>
                 </div>
                 <div
                   className="flex prtclk items-center gap-2"
@@ -309,7 +306,7 @@ export const StartMenu = () => {
                       fill="currentColor"
                     />
                   </svg>
-                  <span>Shut down</span>
+                  <span className="whitespace-nowrap">Shut down</span>
                 </div>
                 <div
                   className="flex prtclk items-center gap-2"
@@ -328,7 +325,7 @@ export const StartMenu = () => {
                       fill="currentColor"
                     />
                   </svg>
-                  <span>Restart</span>
+                  <span className="whitespace-nowrap">Restart</span>
                 </div>
               </div>
               <svg
@@ -421,7 +418,7 @@ export const StartMenu = () => {
                           className="topApp pt-6 py-4 ltShad prtclk"
                           onClick={clickDispatch}
                           data-action={app.action}
-                          data-payload={app.payload || "full"}
+                          data-payload={app.payload || 'mini'}
                         >
                           <Icon src={app.icon} width={30} />
                           <div className="text-xs mt-2">{app.name}</div>
@@ -461,7 +458,7 @@ export const StartMenu = () => {
                   className="openlink w-4/5 flex prtclk handcr pt-3"
                   onClick={clickDispatch}
                   data-action={match.action}
-                  data-payload={match.payload ? match.payload : "full"}
+                  data-payload={match.payload || 'mini'}
                 >
                   <Icon className="blueicon" src="link" ui width={16} />
                   <div className="text-xss ml-3">Open</div>

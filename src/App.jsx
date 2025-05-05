@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useDispatch, useSelector } from "react-redux";
 import "./i18nextConf";
@@ -14,7 +14,10 @@ import {
   WidPane,
 } from "./components/start";
 import Taskbar from "./components/taskbar";
-import { Background, BootScreen, LockScreen } from "./containers/background";
+import { Background, BootScreen, LockScreen, ShutdownScreen } from "./containers/background";
+
+// Импорт компонента лендинга
+import LandingPage from "./components/LandingPage/LandingPage";
 
 import { loadSettings } from "./actions";
 import * as Applications from "./containers/applications";
@@ -70,7 +73,45 @@ function ErrorFallback({ error, resetErrorBoundary }) {
 function App() {
   const apps = useSelector((state) => state.apps);
   const wall = useSelector((state) => state.wallpaper);
-  const dispatch = useDispatch();
+  const originalDispatch = useDispatch();
+  
+  // Создаем улучшенный диспетчер, который будет закрывать предыдущие меню
+  const dispatch = (action) => {
+    // Проверяем, является ли действие открытием меню
+    const openActions = ["STARTSHW", "STARTOGG", "STARTSRC", "BANDTOGG", "PANETOGG", "WIDGTOGG", "CALNTOGG"];
+    
+    if (openActions.includes(action.type)) {
+      // Если открывается любое меню, закрываем все остальные
+      const closeActions = [
+        {type: "STARTHID"}, // Закрываем меню Пуск
+        {type: "BANDHIDE"}, // Закрываем панель уведомлений
+        {type: "PANEHIDE"}, // Закрываем боковую панель
+        {type: "WIDGHIDE"}, // Закрываем виджеты
+        {type: "CALNHIDE"}, // Закрываем календарь
+        {type: "MENUHIDE"}  // Закрываем контекстное меню
+      ];
+      
+      // Фильтруем, чтобы не закрывать то меню, которое сейчас открываем
+      closeActions.forEach(closeAction => {
+        // Не закрываем меню, соответствующее текущему действию открытия
+        if ((action.type === "STARTSHW" || action.type === "STARTOGG" || action.type === "STARTSRC") && 
+            closeAction.type === "STARTHID") {
+          return;
+        }
+        
+        if (action.type === "BANDTOGG" && closeAction.type === "BANDHIDE") return;
+        if (action.type === "PANETOGG" && closeAction.type === "PANEHIDE") return;
+        if (action.type === "WIDGTOGG" && closeAction.type === "WIDGHIDE") return;
+        if (action.type === "CALNTOGG" && closeAction.type === "CALNHIDE") return;
+        
+        // Отправляем действие закрытия для других меню
+        originalDispatch(closeAction);
+      });
+    }
+    
+    // Выполняем исходное действие
+    return originalDispatch(action);
+  };
 
   const afterMath = (event) => {
     var ess = [
@@ -100,25 +141,25 @@ function App() {
     });
   };
 
-  window.oncontextmenu = (e) => {
-    afterMath(e);
-    e.preventDefault();
-    // dispatch({ type: 'GARBAGE'});
-    var data = {
-      top: e.clientY,
-      left: e.clientX,
-    };
-
-    if (e.target.dataset.menu != null) {
-      data.menu = e.target.dataset.menu;
-      data.attr = e.target.attributes;
-      data.dataset = e.target.dataset;
-      dispatch({
-        type: "MENUSHOW",
-        payload: data,
-      });
-    }
-  };
+  // window.oncontextmenu = (e) => { // Temporarily commented out
+  //   afterMath(e);
+  //   e.preventDefault();
+  //   // dispatch({ type: 'GARBAGE'});
+  //   var data = {
+  //     top: e.clientY,
+  //     left: e.clientX,
+  //   };
+  //
+  //   if (e.target.dataset.menu != null) {
+  //     data.menu = e.target.dataset.menu;
+  //     data.attr = e.target.attributes;
+  //     data.dataset = e.target.dataset;
+  //     dispatch({
+  //       type: "MENUSHOW",
+  //       payload: data,
+  //     });
+  //   }
+  // };
 
   window.onclick = afterMath;
 
@@ -130,43 +171,79 @@ function App() {
     if (!window.onstart) {
       loadSettings();
       window.onstart = setTimeout(() => {
-        // console.log("prematurely loading ( ﾉ ﾟｰﾟ)ﾉ");
         dispatch({ type: "WALLBOOTED" });
       }, 5000);
     }
-  });
+  }, [dispatch]);
+
+  // Эффект для управления прокруткой body
+  useEffect(() => {
+    const isContentVisible = wall.booted && !wall.locked;
+    
+    if (isContentVisible) {
+      // Если контент виден, разрешаем прокрутку
+      document.body.style.overflow = '';
+    } else {
+      // Если идет загрузка или экран блокировки, запрещаем прокрутку
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Функция очистки: возвращаем стандартную прокрутку при размонтировании App
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [wall.booted, wall.locked]); // Зависимости эффекта
 
   return (
-    <div className="App">
+    <div className="App" style={{ position: 'relative' }}>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
-        {!wall.booted ? <BootScreen dir={wall.dir} /> : null}
-        {wall.locked ? <LockScreen dir={wall.dir} /> : null}
-        <div className="appwrap">
-          <Background />
-          <div className="desktop" data-menu="desk">
-            <DesktopApp />
-            {Object.keys(Applications).map((key, idx) => {
-              var WinApp = Applications[key];
-              return <WinApp key={idx} />;
-            })}
-            {Object.keys(apps)
-              .filter((x) => x != "hz")
-              .map((key) => apps[key])
-              .map((app, i) => {
-                if (app.pwa) {
-                  var WinApp = Drafts[app.data.type];
-                  return <WinApp key={i} icon={app.icon} {...app.data} />;
-                }
-              })}
-            <StartMenu />
-            <BandPane />
-            <SidePane />
-            <WidPane />
-            <CalnWid />
+        {/* Экраны загрузки, блокировки и выключения */} 
+        {!wall.booted && wall.act !== 'shutdn' ? <BootScreen dir={wall.dir} /> : null} 
+        {wall.locked && wall.act !== 'shutdn' ? <LockScreen dir={wall.dir} /> : null} 
+        {wall.act === 'shutdn' ? <ShutdownScreen /> : null} {/* Показываем экран выключения */}
+
+        {/* Основное содержимое приложения (рабочий стол и т.д.) */}
+        {/* Обертка рабочего стола и лендинга - показываем только если не выключение */} 
+        {wall.act !== 'shutdn' && (
+          <div style={{
+            position: 'relative',
+            zIndex: 0
+          }}>
+            {/* Основной интерфейс - показываем только если загружено и не заблокировано */} 
+            {wall.booted && !wall.locked && (
+              <div className={`appwrap`}>
+                <Background />
+                <div className="desktop" data-menu="desk">
+                  <DesktopApp />
+                  {Object.keys(Applications).map((key, idx) => {
+                    var WinApp = Applications[key];
+                    return <WinApp key={idx} />;
+                  })}
+                  {Object.keys(apps)
+                    .filter((x) => x != "hz")
+                    .map((key) => apps[key])
+                    .map((app, i) => {
+                      if (app.pwa) {
+                        var WinApp = Drafts[app.data.type];
+                        return <WinApp key={i} icon={app.icon} {...app.data} />;
+                      }
+                    })}
+                  <StartMenu />
+                  <BandPane />
+                  <SidePane />
+                  <WidPane />
+                  <CalnWid />
+                </div>
+                <Taskbar />
+                <ActMenu />
+              </div>
+            )}
+
+            {/* Лендинг - показываем всегда, когда не выключение */}
+            <LandingPage />
           </div>
-          <Taskbar />
-          <ActMenu />
-        </div>
+        )}
+
       </ErrorBoundary>
     </div>
   );

@@ -1,4 +1,34 @@
 {
+  "C:": {
+    "$RECYCLE.BIN": {
+      "name": "Recycle Bin",
+      "info": "FOLDER",
+      "icon": "bin1",
+      "type": "special",
+      "action": "EXPLORER",
+      "payload": "C:\\$RECYCLE.BIN"
+    },
+    "Users": {
+      "Default": {},
+      "Public": {},
+      "Topson": {
+        "name": "Topson",
+        "info": "FOLDER",
+        "icon": "user",
+        "type": "folder",
+        "content": {
+          "AppData": {},
+          "config.cfg": {},
+          "Contacts": {
+            "name": "Contacts",
+            "info": "FOLDER",
+            "icon": "folder",
+            "type": "folder"
+          }
+        }
+      }
+    }
+  },
   "backup": {
     "config": {}
   },
@@ -121,46 +151,6 @@
     "SafetyTips": {},
     "ShaderCache": {},
     "SSLErrorAssistant": {}
-  },
-  "Users": {
-    "Default": {},
-    "Public": {},
-    "Blue": {
-      "AppData": {},
-      "config.cfg": {},
-      "Contacts": {},
-      "Cookies": {},
-      "Desktop": {},
-      "Documents": {},
-      "Downloads": {},
-      "Favorites": {},
-      "geckodriver.log": {},
-      "get-pip.py": {},
-      "IntelGraphicsProfiles": {},
-      "javac": {},
-      "joke.txt": {
-        "content": "I have a joke on recursion but I have a joke on ..."
-      },
-      "Links": {},
-      "LocalSettings": {},
-      "MicrosoftEdgeBackups": {},
-      "Music": {},
-      "MyDocuments": {},
-      "NetHood": {},
-      "OneDrive": {},
-      "Postman": {},
-      "PrintHood": {},
-      "Recent": {},
-      "SavedGames": {},
-      "Searches": {},
-      "StartMenu": {},
-      "supersecret.txt": {
-        "content": "github: github.com/blueedgetechno\nwebsite: blueedge.me"
-      },
-      "Templates": {},
-      "VirtualBoxVMs": {},
-      "vmlogs": {}
-    }
   },
   "Windows": {
     "addins": {},

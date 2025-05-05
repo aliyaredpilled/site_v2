@@ -41,7 +41,7 @@ const taskReducer = (state = defState, action) => {
       return {
         ...state,
         prev: true,
-        prevApp: (action.payload && action.payload.app) || "store",
+        prevApp: (action.payload && action.payload.app) || "edge",
         prevPos: (action.payload && action.payload.pos) || 50,
       };
     case "TASKPHIDE":

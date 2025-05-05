@@ -7,6 +7,7 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import * as FaIcons from "@fortawesome/free-solid-svg-icons";
 import * as FaRegIcons from "@fortawesome/free-regular-svg-icons";
 import * as AllIcons from "./icons";
+import * as LucideIcons from 'lucide-react';
 
 String.prototype.strip = function (c) {
   var i = 0,
@@ -27,8 +28,16 @@ export const Icon = (props) => {
   const sidepane = useSelector((state) => state.sidepane);
 
   const dispatch = useDispatch();
-  var src = `img/icon/${props.ui != null ? "ui/" : ""}${props.src}.png`;
-  if (props.ext != null || (props.src && props.src.includes("http"))) {
+  
+  let isLucide = false;
+  let LucideIconComponent = null;
+  let src = `img/icon/${props.ui != null ? "ui/" : ""}${props.src}.png`;
+
+  if (typeof props.src === 'string' && props.src.startsWith('lucide:')) {
+    isLucide = true;
+    const iconName = props.src.substring(7);
+    LucideIconComponent = LucideIcons[iconName] || LucideIcons.HelpCircle;
+  } else if (props.ext != null || (props.src && props.src.includes("http"))) {
     src = props.src;
   }
 
@@ -97,6 +106,33 @@ export const Icon = (props) => {
             fill: props.color || null,
             margin: props.margin || null,
           }}
+        />
+      </div>
+    );
+  } else if (isLucide && LucideIconComponent) {
+    return (
+      <div
+        className={`uicon ${props.className || ""} ${prtclk}`}
+        data-open={props.open}
+        data-action={props.click}
+        data-active={props.active}
+        data-payload={props.payload}
+        onClick={props.onClick || (props.pr && clickDispatch) || null}
+        data-menu={props.menu}
+        data-pr={props.pr}
+        style={{
+          width: props.width,
+          height: props.height || props.width,
+          margin: props.margin || null,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <LucideIconComponent 
+          size={props.width * 0.7}
+          color={props.color || 'currentColor'}
+          strokeWidth={props.strokeWidth || 2}
         />
       </div>
     );
@@ -314,7 +350,20 @@ export const ToolBar = (props) => {
 
   const toolDrag = (e) => {
     e = e || window.event;
+
+    // Проверяем, находится ли цель внутри .appwrap
+    const targetElement = e.target;
+    const appWrapElement = targetElement.closest('.appwrap');
+    const landingPageElement = targetElement.closest('.landing-page-container');
+
+    // Если элемент не внутри .appwrap (это лендинг) ИЛИ он внутри .landing-page-container, выходим
+    if (!appWrapElement || landingPageElement) {
+      return; // Позволяем стандартное поведение (выделение)
+    }
+
+    // Если внутри .appwrap (это рабочий стол/окно), предотвращаем стандартное поведение
     e.preventDefault();
+
     posM = [e.clientY, e.clientX];
     op = e.currentTarget.dataset.op;
 
@@ -356,6 +405,14 @@ export const ToolBar = (props) => {
 
   const eleDrag = (e) => {
     e = e || window.event;
+
+    // Проверяем, активен ли флаг wnapp (drag начался в appwrap)
+    // ИЛИ если вдруг событие пришло от лендинга (доп. проверка)
+    const landingPageElement = e.target.closest('.landing-page-container');
+    if (!wnapp || landingPageElement) {
+      return;
+    }
+
     e.preventDefault();
 
     var pos0 = posP[0] + e.clientY - posM[0],
@@ -451,7 +508,6 @@ export const ToolBar = (props) => {
               snap={snap}
               closeSnap={closeSnap}
             />
-            {/* {snap?<SnapScreen app={props.app} closeSnap={closeSnap}/>:null} */}
           </div>
           <Icon
             className="closeBtn"

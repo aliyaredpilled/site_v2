@@ -25,11 +25,17 @@ export const WidPane = () => {
           <div className="widtop">
             <Icon fafa="faEllipsisH" width={12} />
           </div>
-          <div className="widTime">
-            {new Date().toLocaleTimeString("en-US", {
-              hour: "numeric",
-              minute: "2-digit",
-            })}
+          <div className="topBar">
+            <div className="widgetName">Widgets</div>
+            <div className="widgetDate">
+              {new Date().toLocaleDateString("ru-RU", { month: "long", day: "numeric" })}
+              ,{" "}
+              {new Date().toLocaleTimeString("ru-RU", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false
+              })}
+            </div>
           </div>
           <div className="widgetCont">
             <div className="topWidgets">

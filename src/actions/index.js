@@ -161,7 +161,6 @@ export const installApp = (data) => {
   app.action = gene_name();
   store.dispatch({ type: "ADDAPP", payload: app });
   store.dispatch({ type: "DESKADD", payload: app });
-  store.dispatch({ type: "WNSTORE", payload: "mnmz" });
 };
 
 export const getTreeValue = (obj, path) => {
@@ -244,6 +243,11 @@ export const loadSettings = () => {
     ) {
       sett.person.theme = "dark";
     }
+  }
+
+  // Принудительно устанавливаем имя пользователя
+  if (sett.person) { // Проверяем, что sett.person существует
+    sett.person.name = "Topson";
   }
 
   if (sett.person.theme != "light") changeTheme();

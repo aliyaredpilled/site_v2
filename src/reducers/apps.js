@@ -7,8 +7,8 @@ if (import.meta.env.MODE == "development") {
 
 const defState = {};
 for (var i = 0; i < allApps.length; i++) {
-  defState[allApps[i].icon] = allApps[i];
-  defState[allApps[i].icon].size = "full";
+  defState[allApps[i].icon] = { ...allApps[i] };
+  defState[allApps[i].icon].size = "mini";
   defState[allApps[i].icon].hide = true;
   defState[allApps[i].icon].max = null;
   defState[allApps[i].icon].z = 0;
@@ -35,7 +35,7 @@ const appReducer = (state = defState, action) => {
       obj.url = null;
     }
 
-    obj.size = "full";
+    obj.size = "mini";
     obj.hide = false;
     obj.max = true;
     tmpState.hz += 1;
@@ -64,7 +64,7 @@ const appReducer = (state = defState, action) => {
     var obj = { ...tmpState["terminal"] };
     obj.dir = action.payload;
 
-    obj.size = "full";
+    obj.size = "mini";
     obj.hide = false;
     obj.max = true;
     tmpState.hz += 1;
@@ -73,7 +73,7 @@ const appReducer = (state = defState, action) => {
     return tmpState;
   } else if (action.type == "ADDAPP") {
     tmpState[action.payload.icon] = action.payload;
-    tmpState[action.payload.icon].size = "full";
+    tmpState[action.payload.icon].size = "mini";
     tmpState[action.payload.icon].hide = true;
     tmpState[action.payload.icon].max = null;
     tmpState[action.payload.icon].z = 0;
@@ -99,34 +99,24 @@ const appReducer = (state = defState, action) => {
           obj.hide = true;
           obj.max = null;
           obj.z = -1;
-          tmpState.hz -= 1;
+          if (obj.z === tmpState.hz) tmpState.hz -= 1;
         } else if (action.payload == "mxmz") {
-          obj.size = ["mini", "full"][obj.size != "full" ? 1 : 0];
+          obj.size = ["mini", "full"][obj.size === "mini" ? 1 : 0];
           obj.hide = false;
           obj.max = true;
-          tmpState.hz += 1;
+          if (obj.z !== tmpState.hz) tmpState.hz += 1;
           obj.z = tmpState.hz;
         } else if (action.payload == "togg") {
-          if (obj.z != tmpState.hz) {
+          if (obj.z !== tmpState.hz) {
             obj.hide = false;
-            if (!obj.max) {
-              tmpState.hz += 1;
-              obj.z = tmpState.hz;
-              obj.max = true;
-            } else {
-              obj.z = -1;
-              obj.max = false;
-            }
+            obj.max = true;
+            tmpState.hz += 1;
+            obj.z = tmpState.hz;
           } else {
-            obj.max = !obj.max;
+            obj.max = false;
             obj.hide = false;
-            if (obj.max) {
-              tmpState.hz += 1;
-              obj.z = tmpState.hz;
-            } else {
-              obj.z = -1;
-              tmpState.hz -= 1;
-            }
+            obj.z = -1;
+            tmpState.hz -= 1;
           }
         } else if (action.payload == "mnmz") {
           obj.max = false;
@@ -149,6 +139,12 @@ const appReducer = (state = defState, action) => {
             tmpState.hz += 1;
             obj.z = tmpState.hz;
           }
+        } else {
+          obj.size = "mini";
+          obj.hide = false;
+          obj.max = true;
+          tmpState.hz += 1;
+          obj.z = tmpState.hz;
         }
 
         tmpState[keys[i]] = obj;

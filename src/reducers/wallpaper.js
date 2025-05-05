@@ -28,8 +28,8 @@ const defState = {
   themes: themes,
   wps: wps,
   src: walls[wps],
-  locked: !(locked == "false"),
-  booted: false || import.meta.env.MODE == "development",
+  locked: import.meta.env.MODE === "development" ? true : !(localStorage.getItem("locked") == "false"),
+  booted: false,
   act: "",
   dir: 0,
 };

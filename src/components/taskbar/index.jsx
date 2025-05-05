@@ -74,6 +74,7 @@ const Taskbar = () => {
                 icon="taskSearch"
               />
             ) : null}
+            {/* Комментируем блок с иконкой виджетов
             {tasks.widgets ? (
               <Icon
                 className="tsIcon widget"
@@ -82,6 +83,7 @@ const Taskbar = () => {
                 click="WIDGTOGG"
               />
             ) : null}
+            */}
             {tasks.apps.map((task, i) => {
               var isHidden = apps[task.icon].hide;
               var isActive = apps[task.icon].z == apps.hz;
@@ -159,13 +161,14 @@ const Taskbar = () => {
             data-action="CALNTOGG"
           >
             <div>
-              {time.toLocaleTimeString("en-US", {
-                hour: "numeric",
-                minute: "numeric",
+              {time.toLocaleTimeString("ru-RU", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false
               })}
             </div>
             <div>
-              {time.toLocaleDateString("en-US", {
+              {time.toLocaleDateString("ru-RU", {
                 year: "2-digit",
                 month: "2-digit",
                 day: "numeric",

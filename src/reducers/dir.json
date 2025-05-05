@@ -74,9 +74,9 @@
               "Public Videos": {}
             }
           },
-          "Blue": {
+          "Topson": {
             "type": "folder",
-            "name": "Blue",
+            "name": "Topson",
             "info": {
               "spid": "%user%",
               "icon": "user"

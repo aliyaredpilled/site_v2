@@ -4,6 +4,7 @@ import * as Actions from "../../actions";
 import { getTreeValue } from "../../actions";
 import { Icon } from "../../utils/general";
 import Battery from "../shared/Battery";
+import { scrollToSectionWithOffset } from "../../utils/scrollUtils";
 import "./searchpane.scss";
 import "./sidepane.scss";
 import "./startmenu.scss";
@@ -45,27 +46,152 @@ export const DesktopApp = () => {
     return arr;
   });
   const dispatch = useDispatch();
+  const theme = useSelector((state) => state.setting.person.theme);
+
+  const lightLogoPath = '/img/ui/topson_logo.png';
+  const darkLogoPath = '/img/landing/topson-logo.png';
+
+  // Маппинг имен иконок на ID секций
+  const scrollTargetMapping = {
+    "О нас": "about",
+    "Проекты": "projects",
+    "Партнеры": "partners",
+    "Контакты": "contact",
+  };
+
+  // Проверка, является ли иконка SVG файлом
+  const isSvgIcon = (icon) => {
+    return typeof icon === 'string' && icon.endsWith('.svg');
+  };
 
   return (
     <div className="desktopCont">
+      <style>
+        {`
+          /* Стили для более выделяющихся SVG иконок */
+          .svg-desktop-icon {
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            padding: 6px;
+            background: rgba(0, 62, 146, 0.6);
+          }
+          
+          .svg-desktop-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.9);
+            background: rgba(0, 78, 180, 0.7);
+          }
+          
+          /* Специальный стиль для увеличенной иконки "Партнеры" */
+          .partners-icon-img {
+            transform: scale(1.25);
+            transition: all 0.3s ease;
+          }
+          
+          .partners-icon-img:hover {
+            transform: scale(1.45);
+          }
+        `}
+      </style>
       {!deskApps.hide &&
         deskApps.apps.map((app, i) => {
-          return (
-            // to allow it to be focusable (:focus)
-            <div key={i} className="dskApp" tabIndex={0}>
-              <Icon
-                click={app.action}
-                className="dskIcon prtclk"
-                src={app.icon}
-                payload={app.payload || "full"}
-                pr
-                width={Math.round(deskApps.size * 36)}
-                menu="app"
-              />
-              <div className="appName">{app.name}</div>
-            </div>
-          );
+          const targetId = scrollTargetMapping[app.name]; // Найти ID для скролла
+          // Увеличиваем размер иконок
+          const iconSize = Math.round(deskApps.size * 58);
+          // Проверяем, является ли это иконкой "Партнеры"
+          const isPartnersIcon = app.name === "Партнеры";
+
+          if (targetId) {
+            // --- Иконка для скролла ---
+            return (
+              <div 
+                key={i} 
+                className="dskApp scrollLink" 
+                tabIndex={0} 
+                onClick={() => scrollToSectionWithOffset(targetId)} // Используем новую функцию
+                title={`Перейти к секции ${app.name}`} 
+              >
+                {isSvgIcon(app.icon) ? (
+                  <div className="svg-icon-wrapper">
+                    <img 
+                      src={app.icon} 
+                      width={iconSize} 
+                      height={iconSize} 
+                      alt={app.name}
+                      className={`dskIcon prtclk ${isPartnersIcon ? 'partners-icon-img' : ''}`}
+                      style={{ objectFit: 'contain' }}
+                    />
+                  </div>
+                ) : (
+                  <Icon
+                    className="dskIcon prtclk" 
+                    src={app.icon} 
+                    color={app.color} 
+                    pr 
+                    width={iconSize}
+                    menu="app"
+                  />
+                )}
+                <div className="appName">{app.name}</div>
+              </div>
+            );
+          } else {
+            // --- Обычная иконка приложения ---
+            return (
+              <div key={i} className="dskApp" tabIndex={0}>
+                {isSvgIcon(app.icon) ? (
+                  <div className="svg-icon-wrapper">
+                    <img 
+                      src={app.icon} 
+                      width={iconSize} 
+                      height={iconSize} 
+                      alt={app.name}
+                      className={`dskIcon prtclk ${isPartnersIcon ? 'partners-icon-img' : ''}`}
+                      style={{ objectFit: 'contain' }}
+                      onClick={() => {
+                        if (app.action) {
+                          if (app.action === "EXTERNAL") {
+                            window.open(app.payload, "_blank");
+                          } else {
+                            const payload = app.action === 'SETTINGS' ? 'full' : (app.payload || 'cstm');
+                            dispatch(Actions[app.action](payload));
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <Icon
+                    className="dskIcon prtclk"
+                    click={app.action} 
+                    payload={app.action === 'SETTINGS' ? 'full' : (app.payload || 'cstm')}
+                    src={app.icon}
+                    color={app.color} 
+                    pr 
+                    width={iconSize}
+                    menu="app"
+                  />
+                )}
+                <div className="appName">{app.name}</div>
+              </div>
+            );
+          }
         })}
+      {/* Topson Logo */}
+      <img 
+        src={theme === 'dark' ? darkLogoPath : lightLogoPath} 
+        alt="Topson Logo" 
+        style={{
+          position: 'absolute',
+          bottom: '10px',
+          right: '10px',
+          width: '100px', // Adjust size as needed
+          height: 'auto',
+          opacity: 0.7, // Make it slightly transparent
+          pointerEvents: 'none' // Prevent interaction
+        }} 
+      />
     </div>
   );
 };
@@ -88,14 +214,14 @@ export const BandPane = () => {
           open="true"
           src="calculator"
         />
-        <Icon
+        {/* <Icon
           className="hvlight"
           width={17}
           click="SPOTIFY"
           payload="togg"
           open="true"
           src="spotify"
-        />
+        /> */}
         <Icon
           className="hvlight"
           width={17}
@@ -279,16 +405,27 @@ export const CalnWid = () => {
   useEffect(() => {
     if (!loaded) {
       setLoad(true);
-      window.dycalendar.draw({
-        target: "#dycalendar",
-        type: "month",
-        dayformat: "ddd",
-        monthformat: "full",
-        prevnextbutton: "show",
-        highlighttoday: true,
-      });
+      // Убедимся, что объект window.dycalendar доступен
+      if (window.dycalendar) { 
+        window.dycalendar.draw({
+          target: "#dycalendar",
+          type: "month",
+          dayformat: "ddd",        
+          monthformat: "full",       
+          prevnextbutton: "show",
+          highlighttoday: true,
+          // Явно передаем параметры локализации
+          localization: {
+            locale: 'ru', // Русская локаль
+            dayNames: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'], // Краткие русские дни
+            monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'] // Полные русские месяцы
+          }
+        });
+      } else {
+        console.error("dycalendar library is not loaded.");
+      }
     }
-  });
+  }, [loaded]); // Зависимость для выполнения один раз
 
   return (
     <div
@@ -298,7 +435,8 @@ export const CalnWid = () => {
     >
       <div className="topBar pl-4 text-sm">
         <div className="date">
-          {new Date().toLocaleDateString(undefined, {
+          {/* Заголовок календаря */} 
+          {new Date().toLocaleDateString("ru-RU", { // Убедимся, что здесь ru-RU
             weekday: "long",
             month: "long",
             day: "numeric",

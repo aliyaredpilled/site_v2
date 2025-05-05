@@ -5,9 +5,7 @@ import { useTranslation } from "react-i18next";
 export const AboutWin = () => {
   const { abOpen } = useSelector((state) => state.desktop);
   const { locked, booted } = useSelector((state) => state.wallpaper);
-  const [open, setOpen] = useState(
-    true && import.meta.env.MODE != "development",
-  );
+  const [open, setOpen] = useState(false);
   const [timer, setTimer] = useState(
     localStorage.getItem("closeAbout") == "true" ? 0 : 5,
   );

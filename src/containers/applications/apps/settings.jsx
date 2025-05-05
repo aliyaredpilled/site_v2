@@ -13,7 +13,7 @@ export const Settings = () => {
 
   const wall = useSelector((state) => state.wallpaper);
 
-  const [page, setPage] = useState("System"); // default System
+  const [page, setPage] = useState("Personalisation"); // default Personalisation
   const [nav, setNav] = useState("");
   const [updating, setUpdating] = useState(false);
   const [upmodalOpen, setUpmodalOpen] = useState(false);
@@ -68,10 +68,11 @@ export const Settings = () => {
             <div className="nav_top">
               <div className="account" onClick={() => setPage("Accounts")}>
                 <img
-                  src="img/settings/defAccount.webp"
-                  alt=""
+                  src="/img/landing/Сервисы/Entrance_cat.png"
+                  alt="User Avatar"
                   height={60}
                   width={60}
+                  style={{ borderRadius: '50%', objectFit: 'cover' }}
                 />
                 <div>
                   <p>{userName}</p>
@@ -116,91 +117,11 @@ export const Settings = () => {
                 <main key={e}>
                   <h1>{e}</h1>
                   <div className="tilesCont win11Scroll">
-                    {data[e].map((e, i) => {
-                      switch (e.type) {
-                        case "sysTop":
-                          return (
-                            <div key={i} className={e.type}>
-                              <div className="left">
-                                <img
-                                  src={`img/wallpaper/${wall.src}`}
-                                  alt=""
-                                  className="device_img"
-                                />
-                                <div className="column_device">
-                                  <p className="device_name">Liber-V</p>
-                                  <p className="device_model">NS14A8</p>
-                                  <p className="device_rename">Rename</p>
-                                </div>
-                              </div>
-                              <div className="right">
-                                <div className="column">
-                                  <img
-                                    src="https://upload.wikimedia.org/wikipedia/commons/2/25/Microsoft_icon.svg"
-                                    height={20}
-                                    alt=""
-                                  />
-                                  <p>
-                                    Microsoft 365
-                                    <br />
-                                    <span className="column_lower">
-                                      View benefits
-                                    </span>
-                                  </p>
-                                </div>
-                                <div
-                                  className="column"
-                                  onClick={() => setPage("Windows Update")}
-                                >
-                                  <img
-                                    src="img/settings/Windows Update.webp"
-                                    alt=""
-                                    height={20}
-                                  />
-                                  <p>
-                                    Windows Update
-                                    <br />
-                                    <span className="column_lower">
-                                      You're up to date
-                                    </span>
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        case "netTop":
-                          return (
-                            <div key={i} className="netTop">
-                              <div>
-                                <img
-                                  src="img/settings/wifi.png"
-                                  alt=""
-                                  height={100}
-                                />
-                                <div>
-                                  <h2 className="font-medium text-lg">WiFi</h2>
-                                  <p>Connected, secured</p>
-                                </div>
-                              </div>
-                              <div className="box">
-                                <span className="settingsIcon"></span>
-                                <div>
-                                  <h3>Properties</h3>
-                                  <p>Public network 5 Ghz</p>
-                                </div>
-                              </div>
-                              <div className="box">
-                                <span className="settingsIcon"></span>
-                                <div>
-                                  <h3>Data Usage</h3>
-                                  <p>
-                                    {Math.round(Math.random() * 100)}GB, last 30
-                                    days
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          );
+                    {data[e].map((item, i) => { // Changed variable name back to 'item' to avoid conflict
+                      switch (item.type) { // Use item.type
+                        // Removed cases for sysTop, netTop, accountsTop, timeTop, langSwitcher, updateTop, subHeading, spacer, tile etc.
+                        // because they are not present in the current settingsData.json
+                        // but kept the structure
                         case "personaliseTop":
                           return (
                             <div key={i} className="personaliseTop">
@@ -212,18 +133,18 @@ export const Settings = () => {
                               <div>
                                 <h3>Select a theme to apply</h3>
                                 <div className="bgBox">
-                                  {wall.themes.map((e, i) => {
+                                  {wall.themes.map((themeItem, themeIdx) => { // Changed variable names
                                     return (
                                       <Image
-                                        key={i}
+                                        key={themeIdx} // Use themeIdx
                                         className={
-                                          wall.src.includes(e) ? "selected" : ""
+                                          wall.src.includes(themeItem) ? "selected" : "" // Use themeItem
                                         }
-                                        src={`img/wallpaper/${e}/img0.jpg`}
+                                        src={`img/wallpaper/${themeItem}/img0.jpg`} // Use themeItem
                                         ext
                                         onClick={handleWallAndTheme}
                                         click="WALLSET"
-                                        payload={`${e}/img0.jpg`}
+                                        payload={`${themeItem}/img0.jpg`} // Use themeItem
                                       />
                                     );
                                   })}
@@ -231,103 +152,14 @@ export const Settings = () => {
                               </div>
                             </div>
                           );
-                        case "accountsTop":
-                          return (
-                            <div key={i} className="accountsTop ">
-                              <img
-                                src="img/settings/defAccount.webp"
-                                alt=""
-                                width={90}
-                              />
-                              <div>
-                                <p>{userName.toUpperCase()}</p>
-                                <p>Local Account</p>
-                                <p>Administrator</p>
-                              </div>
-                            </div>
-                          );
-                        case "timeTop":
-                          return (
-                            <div className="timeTop">
-                              <h1>
-                                {new Date().toLocaleTimeString("en-US", {
-                                  hour: "numeric",
-                                  minute: "numeric",
-                                  hour12: true,
-                                })}
-                              </h1>
-                            </div>
-                          );
-                        case "langSwitcher":
-                          return (
-                            <div key={i} className="tile langSwitcherTile">
-                              <span className="settingsIcon"></span>
-                              <div className="tile_content">
-                                <p>Windows display language</p>
-                                <p className="tile_desc">
-                                  Windows features like Settings and File
-                                  Explorer will appear in this language
-                                </p>
-                              </div>
-                              <LangSwitch />
-                            </div>
-                          );
-                        case "updateTop":
-                          return (
-                            <div key={i} className="updateTop">
-                              <div className="left">
-                                <img
-                                  src="img/settings/update.png"
-                                  width={90}
-                                  alt=""
-                                />
-                                <div>
-                                  <h2>You're up to date</h2>
-                                  <p>Last checked: Today</p>
-                                </div>
-                              </div>
-                              <div className="right">
-                                <div
-                                  className="btn"
-                                  onClick={() => {
-                                    setUpdating(true);
-                                    setTimeout(() => {
-                                      setUpdating(false);
-                                      setUpmodalOpen(true);
-                                    }, Math.random() * 2000);
-                                  }}
-                                >
-                                  {updating
-                                    ? "Checking for updates..."
-                                    : "Check for updates"}
-                                </div>
-                              </div>
-                            </div>
-                          );
-
-                        case "subHeading":
-                        case "spacer":
-                          return (
-                            <div key={i} className={e.type}>
-                              {e.name}
-                            </div>
-                          );
-                        case "tile":
-                        case "tile square":
-                        case "tile thin-blue":
-                          return (
-                            <div key={e.name} className={e.type}>
-                              <span className="settingsIcon">{e.icon}</span>
-                              <div>
-                                <p>{e.name}</p>
-                                <p className="tile_desc">{e.desc}</p>
-                              </div>
-                            </div>
-                          );
                         default:
-                          return console.log(
-                            `error - type ${e.type} not found`,
-                          );
+                          // Log error only if the type is unexpected based on current data
+                          if (item.type !== 'personaliseTop') {
+                             console.log(
+                              `Warning: Unexpected item type '${item.type}' found in settingsData.json for page '${e}'.`,
+                            );
+                          }
+                          return null; // Return null for any unexpected type
                       }
                     })}
                   </div>
